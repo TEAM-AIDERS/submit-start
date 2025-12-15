@@ -1,5 +1,5 @@
-import os
-os.environ["OPENAI_API_KEY"] = "본인 API 키"
+#import os
+#os.environ["OPENAI_API_KEY"] = "본인 API 키"
 
 from openai import OpenAI
 import numpy as np
