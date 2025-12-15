@@ -1,7 +1,10 @@
 # slack/blocks.py
 from datetime import datetime
+from llm.report_generator import generate_report
+from inputs.sample_input import sample_issue
 
-def build_blocks(issue: dict, report_text: str):
+
+def build_blocks(issue: dict, report_text: str, apology_text: str) -> list:
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
 
     return [
@@ -49,6 +52,59 @@ def build_blocks(issue: dict, report_text: str):
         },
         {"type": "divider"},
         {
+        "type": "context",
+        "elements": [
+            {
+                "type": "mrkdwn",
+                "text": "⚠️ *위험도:* 빠른 확산 단계 — 1차 공식 대응 권장"
+            }
+        ]
+    },
+    {"type": "divider"},
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "*🎯  권장 대응 전략*"
+        }
+    },
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": (
+                "• *신속한 공식 입장 발표*\n"
+                "불확실한 추측 확산 이전에 사실 기반 입장 공개\n\n"
+                "• *내부 조사 및 재발 방지 커뮤니케이션*\n"
+                "콘셉트 개발 프로세스 점검 및 개선 의지 명확화\n\n"
+                "• *팬 소통 강화*\n"
+                "SNS 및 공식 커뮤니티를 통한 감정 공감 중심 소통"
+            )
+        }
+    },
+    {"type": "divider"},
+    {
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": "*💬  팬 커뮤니케이션 가이드*"
+        }
+    },
+    {
+        "type": "section",
+        "fields": [
+            {
+                "type": "mrkdwn",
+                "text": "*DO*\n• 감정 공감 우선\n• 명확하고 쉬운 표현\n• 빠른 초기 반응"
+            },
+            {
+                "type": "mrkdwn",
+                "text": "*DON'T*\n• 법적·방어적 표현\n• 책임 회피성 언급\n• 기계적 반복 답변"
+            }
+        ]
+    },
+    {"type": "divider"},
+        {
             "type": "section",
             "text": {"type": "mrkdwn", "text": "*📝 공식 사과문 초안*"}
         },
@@ -56,7 +112,7 @@ def build_blocks(issue: dict, report_text: str):
             "type": "section",
             "text": {
                 "type": "mrkdwn",
-                "text": f"```{report_text}```"
+                "text": f"```{apology_text}```"
             }
         },
         {"type": "divider"},

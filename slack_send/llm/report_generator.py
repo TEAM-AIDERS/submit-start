@@ -28,16 +28,24 @@ def build_prompt(issue: dict) -> str:
    - 5~6문장 이내로 간결하게 작성하세요.
    
 한국어로 존댓말을 유지하며 작성해 주세요.
+
+[출력 형식]
+아래 형식을 반드시 지켜서 출력하세요.
+---REPORT_START---
+1. 현재 상황 요약
+2. 기획사 대응 전략 2~3가지
+3. 팬 커뮤니케이션 시 유의점
+---REPORT_END---
+
+---APOLOGY_START---
+
+---APOLOGY_END---
+
 """
     
 
-def generate_report(issue: dict) -> str:
-    """
-    팬덤 이슈 입력을 받아
-    → 대응 전략 리포트를 생성한다
-    """
+def generate_report(issue: dict) -> dict:
     client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
     prompt = build_prompt(issue)
 
     response = client.responses.create(
@@ -45,4 +53,12 @@ def generate_report(issue: dict) -> str:
         input=prompt
     )
 
-    return response.output_text
+    text = response.output_text
+
+    report = text.split("---REPORT_START---")[1].split("---REPORT_END---")[0].strip()
+    apology = text.split("---APOLOGY_START---")[1].split("---APOLOGY_END---")[0].strip()
+
+    return {
+        "report": report,
+        "apology": apology
+    }

@@ -13,7 +13,7 @@ def main():
 
     try:
         print("[DOLPIN] LLM 리포트 생성 중...")
-        report_text = generate_report(sample_issue)
+        result = generate_report(sample_issue)
         print("[DOLPIN] 리포트 생성 완료")
     except Exception as e:
         print("[DOLPIN][ERROR] 리포트 생성 실패")
@@ -22,7 +22,7 @@ def main():
 
     try:
         print("[DOLPIN] Slack Block Kit 생성 중...")
-        blocks = build_blocks(sample_issue, report_text)
+        blocks = build_blocks(sample_issue, result["report"], result["apology"])
 
         print("[DOLPIN] Slack 전송 중...")
         send_blocks(blocks)
