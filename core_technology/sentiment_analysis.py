@@ -94,32 +94,55 @@ sentiment_prompt = """
 - 작성자 유형: {author_type}
 """
 
-def analyze_sentiment(message):
+import json
+
+def analyze_sentiment(message: dict) -> dict:
     response = client.chat.completions.create(
         model="gpt-4.1",
         messages=[{
             "role": "user",
             "content": sentiment_prompt.format(
-                text=message["text"],
-                platform=message["platform"],
-                has_image=message["has_image"],
-                has_video=message["has_video"],
-                author_type=message["author_type"]
+                text=message["content_data"]["text"],
+                platform=message["source"],
+                has_image=message["content_data"].get("has_image", False),
+                has_video=message["content_data"].get("has_video", False),
+                author_type=message["content_data"].get("author_type", "unknown")
             )
         }]
     )
-    return response.choices[0].message.content
+
+    try:
+        result = json.loads(response.choices[0].message.content)
+    except Exception:
+        return {
+            "label": "중립",
+            "confidence": 0.0,
+            "reason": "LLM output parsing 실패"
+        }
+
+    return {
+        "sentiment_label": result["label"],
+        "sentiment_confidence": result["confidence"],
+        "sentiment_reason": result["reason"]
+    }
 
 fan_message = {
-    "text": "오늘 무대 찢었다;;",
-    "lang": "ko",
-    "platform": "X",
-    "has_image": False,
-    "has_video": True,
-    "author_type": "fan",
-    "is_reply": False,
-    "is_quote": False
+    "message_id": "uuid-12345",
+    "type": "post",
+    "source": "X",
+    "collected_at": "2024-03-21T10:05:00Z",
+    "keyword": "aespa",
+    "content_data": {
+        "text": "오늘 무대 찢었다;;",
+        "author_id": "user_123",
+        "has_image": False,
+        "has_video": True,
+        "author_type": "fan",
+        "metrics": {
+            "likes": 120,
+            "retweets": 30
+        }
+    }
 }
-
 result = analyze_sentiment(fan_message)
 print(result)
